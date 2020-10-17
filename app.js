@@ -84,26 +84,40 @@ seaBattle.prototype = {
     let footer = document.createElement("div");
     footer.setAttribute("class", "footer");
 
-    this.startGameButton = document.createElement('button');
+    this.startGameButton = document.createElement("button");
     this.startGameButton.innerHTML = "Start the Game";
     this.startGameButton.setAttribute("class", "btn");
-    this.startGameButton.addEventListener('click',()=> {
+    this.startGameButton
+      .addEventListener("click", () => {
         this.startNewGame();
-    }).bind(this);
+      })
+      .bind(this);
     footer.appendChild(this.startGameButton);
     this.gameArea.appendChild(footer);
   },
-startNewGame: function() {
+  startNewGame: function () {
     this.userName = this.userName || prompt('Enter your name,"Viktor"');
     this.computerName = this.computerName;
 
-    if(!this.userName) {
-        alert('Wrong name');
-        return;
+    if (!this.userName) {
+      alert("Wrong name");
+      return;
     }
-    this.startGameButton.innerHTML = 'Start over';
+    this.startGameButton.innerHTML = "Start over";
     this.computerName.innerHTML = `${this.computerName} your Enemy`;
     this.userName.innerHTML = `${this.userName} your field`;
-}
 
+    this._computerShipsMap = this.generateRandomShipMap();
+    this._userShipsMap = this.generateRandomShipMap();
+    this._computerShotMap = this.generateShotMap();
+
+    this._userHits = 0;
+    this._computerHits = 0;
+    this._blockHeight = null;
+    this._gameStopped = false;
+    this._computerGoes = false;
+
+    this.drawCamePoints();
+    this.updateToolbar();
+  },
 };
