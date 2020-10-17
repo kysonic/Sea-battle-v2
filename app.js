@@ -62,22 +62,34 @@ seaBattle.prototype = {
     this.gameArea.appendChild(computerGameArea);
 
     let userGameArea = document.createElement("div");
-    userGameArea.setAttribute('class','user-game-area');
+    userGameArea.setAttribute("class", "user-game-area");
     this.gameArea.appendChild(userGameArea);
 
-    this.computerInfo = document.createElement('div');
+    this.computerInfo = document.createElement("div");
     computerGameArea.appendChild(this.computerInfo);
 
-    this.userInfo = document.createElement('div');
+    this.userInfo = document.createElement("div");
     userGameArea.appendChild(this.userInfo);
 
-    this.computerGameField = document.createElement('div');
-    this.computerGameField.setAttribute('class','game-field');
+    this.computerGameField = document.createElement("div");
+    this.computerGameField.setAttribute("class", "game-field");
 
-    this.userGameField = document.createElement('div');
-    this.userGameField.setAttribute('class','game-field');
+    this.userGameField = document.createElement("div");
+    this.userGameField.setAttribute("class", "game-field");
 
     computerGameArea.appendChild(this.computerGameField);
     userGameArea.appendChild(this.userGameField);
   },
+  createFooter: function() {
+      let footer = document.createElement('div');
+      footer.setAttribute('class','footer');
+
+      this.startGameButton.innerHTML = 'Start the Game';
+      this.startGameButton.setAttribute('class','btn');
+      this.startGameButton.addEventListener('click',() => this.startNewGame()).bind(this);
+
+      footer.appendChild(this.startGameButton);
+      this.gameArea.appendChild(footer);
+  }
+
 };
