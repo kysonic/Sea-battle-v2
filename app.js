@@ -80,16 +80,30 @@ seaBattle.prototype = {
     computerGameArea.appendChild(this.computerGameField);
     userGameArea.appendChild(this.userGameField);
   },
-  createFooter: function() {
-      let footer = document.createElement('div');
-      footer.setAttribute('class','footer');
+  createFooter: function () {
+    let footer = document.createElement("div");
+    footer.setAttribute("class", "footer");
 
-      this.startGameButton.innerHTML = 'Start the Game';
-      this.startGameButton.setAttribute('class','btn');
-      this.startGameButton.addEventListener('click',() => this.startNewGame()).bind(this);
+    this.startGameButton = document.createElement('button');
+    this.startGameButton.innerHTML = "Start the Game";
+    this.startGameButton.setAttribute("class", "btn");
+    this.startGameButton.addEventListener('click',()=> {
+        this.startNewGame();
+    }).bind(this);
+    footer.appendChild(this.startGameButton);
+    this.gameArea.appendChild(footer);
+  },
+startNewGame: function() {
+    this.userName = this.userName || prompt('Enter your name,"Viktor"');
+    this.computerName = this.computerName;
 
-      footer.appendChild(this.startGameButton);
-      this.gameArea.appendChild(footer);
-  }
+    if(!this.userName) {
+        alert('Wrong name');
+        return;
+    }
+    this.startGameButton.innerHTML = 'Start over';
+    this.computerName.innerHTML = `${this.computerName} your Enemy`;
+    this.userName.innerHTML = `${this.userName} your field`;
+}
 
 };
