@@ -45,3 +45,39 @@ function seaBattle(gameAreaId) {
   this.computerGameField = null;
   this.userGameField = null;
 }
+
+seaBattle.prototype = {
+  // Вызов ф-й создающих необходимую для игры разметку
+  init: function () {
+    this.createToolbar(), this.createGameFields(), this.createFooter();
+  },
+  createToolbar: function () {
+    this.toolbar = document.createElement("div");
+    this.toolbar.setAttribute("class", "toolbar");
+    this.gameArea.appendChild(this.toolbar);
+  },
+  createGameFields: function () {
+    let computerGameArea = document.createElement("div");
+    computerGameArea.setAttribute("class", "computer-game-area");
+    this.gameArea.appendChild(computerGameArea);
+
+    let userGameArea = document.createElement("div");
+    userGameArea.setAttribute('class','user-game-area');
+    this.gameArea.appendChild(userGameArea);
+
+    this.computerInfo = document.createElement('div');
+    computerGameArea.appendChild(this.computerInfo);
+
+    this.userInfo = document.createElement('div');
+    userGameArea.appendChild(this.userInfo);
+
+    this.computerGameField = document.createElement('div');
+    this.computerGameField.setAttribute('class','game-field');
+
+    this.userGameField = document.createElement('div');
+    this.userGameField.setAttribute('class','game-field');
+
+    computerGameArea.appendChild(this.computerGameField);
+    userGameArea.appendChild(this.userGameField);
+  },
+};
