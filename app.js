@@ -117,7 +117,21 @@ seaBattle.prototype = {
     this._gameStopped = false;
     this._computerGoes = false;
 
-    this.drawCamePoints();
+    this.drawGamePoints();
     this.updateToolbar();
+  },
+
+  drawGamePoints: function () {
+    this.gameFieldBorderY.forEach((yPoint) =>
+      this.gameFieldBorderX.forEach((xPoint) => {
+        let computerPointBlock = getOrCreateBlock(yPoint, xPoint);
+        computerPointBlock.addEventListener(
+          "click",
+          function (e) {
+            this.userFire(e);
+          }.bind(this)
+        );
+      })
+    );
   },
 };
