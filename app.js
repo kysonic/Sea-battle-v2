@@ -127,11 +127,46 @@ seaBattle.prototype = {
         let computerPointBlock = getOrCreateBlock(yPoint, xPoint);
         computerPointBlock.addEventListener(
           "click",
-          function (e) {
+          function(e) {
             this.userFire(e);
           }.bind(this)
         );
+        let userPointBlock = getOrCreateBlock(yPoint, xPoint, "user");
+        if (this._userShipsMap[yPoint][xPoint] === this.CELL_WITH_SHIP) {
+          userPointBlock.setAttribute("class", "ship");
+        }
       })
     );
   },
+  _blockHeight = null,
+
+  getOrCreateBlock: function(yPoint,xPoint,type) {
+      let id = this.getPointBlockByCoords(yPoint,xPoint,type)
+      let block = document.getElementById(id);
+      if (block) {
+          block.innerHTML = '';
+          block.setAttribute('class','');
+      } else {
+          block = document.createElement('div');
+          block.setAttribute('id',id);
+          block.setAttribute('data-x',xPoint)
+          block.setAttribute('data-y',yPoint)
+          if(type && type === 'user') {
+              this.userGameField.appendChild(block);
+          } else {
+              this.computerGameField.appendChild(block)
+          }         
+      }
+      block.style.width = (100 / this.gameFieldBorderY.length) + '%';
+            if(!this._blockHeight){
+                this._blockHeight = block.clientWidth;
+            }
+            block.style.height = this._blockHeight + 'px';
+            block.style.lineHeight = this._blockHeight + 'px';
+            block.style.fontSize = this._blockHeight + 'px';
+            return block;
+  },
+
+
+  
 };
