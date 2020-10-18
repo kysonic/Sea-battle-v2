@@ -291,8 +291,46 @@ seaBattle.prototype = {
       }
       return false
   },
-
+  canPutHorizontal: function (map, xPoint, yPoint, shipLength, coordLength) {
+    var freePoints = 0;
+    for (var x = xPoint; x < coordLength; x++) {
+      // текущая и далее по часовй стрелке в гориз направл
+      if (
+        map[yPoint][x] === this.CELL_EMPTY &&
+        map[yPoint - 1][x] === this.CELL_EMPTY &&
+        map[yPoint - 1][x + 1] === this.CELL_EMPTY &&
+        map[yPoint][x + 1] === this.CELL_EMPTY &&
+        map[yPoint + 1][x + 1] === this.CELL_EMPTY &&
+        map[yPoint + 1][x] === this.CELL_EMPTY
+      ) {
+        freePoints++;
+      } else {
+        break;
+      }
+    }
+    return freePoints >= shipLength;
+  },
+  canPutVertical: function (map, xPoint, yPoint, shipLength, coordLength) {
+    var freePoints = 0;
+    for (var y = yPoint; y < coordLength; y++) {
+      // текущая и далее по часовй стрелке в вертикальном направлении
+      if (
+        map[y][xPoint] === this.CELL_EMPTY &&
+        map[y + 1][xPoint] === this.CELL_EMPTY &&
+        map[y + 1][xPoint + 1] === this.CELL_EMPTY &&
+        map[y + 1][xPoint] === this.CELL_EMPTY &&
+        map[y][xPoint - 1] === this.CELL_EMPTY &&
+        map[y - 1][xPoint - 1] === this.CELL_EMPTY
+      ) {
+        freePoints++;
+      } else {
+        break;
+      }
+    }
+    return freePoints >= shipLength;
+  },
   
+
 
 
 
