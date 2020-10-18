@@ -127,7 +127,7 @@ seaBattle.prototype = {
         let computerPointBlock = getOrCreateBlock(yPoint, xPoint);
         computerPointBlock.addEventListener(
           "click",
-          function(e) {
+          function (e) {
             this.userFire(e);
           }.bind(this)
         );
@@ -138,35 +138,135 @@ seaBattle.prototype = {
       })
     );
   },
-  _blockHeight = null,
+  // _blockHeight = null,
 
-  getOrCreateBlock: function(yPoint,xPoint,type) {
-      let id = this.getPointBlockByCoords(yPoint,xPoint,type)
-      let block = document.getElementById(id);
-      if (block) {
-          block.innerHTML = '';
-          block.setAttribute('class','');
+  getOrCreatePointBlock: function (yPoint, xPoint, type) {
+    var id = this.getPointBlockIdByCoords(yPoint, xPoint, type);
+    var block = document.getElementById(id);
+    if (block) {
+      block.innerHTML = "";
+      block.setAttribute("class", "");
+    } else {
+      block = document.createElement("div");
+      block.setAttribute("id", id);
+      block.setAttribute('data-x', xPoint);
+      block.setAttribute("data-y", yPoint);
+      if (type && type === "user") {
+        this.userGameField.appendChild(block);
       } else {
-          block = document.createElement('div');
-          block.setAttribute('id',id);
-          block.setAttribute('data-x',xPoint)
-          block.setAttribute('data-y',yPoint)
-          if(type && type === 'user') {
-              this.userGameField.appendChild(block);
-          } else {
-              this.computerGameField.appendChild(block)
-          }         
+        this.pcGameField.appendChild(block);
       }
-      block.style.width = (100 / this.gameFieldBorderY.length) + '%';
-            if(!this._blockHeight){
-                this._blockHeight = block.clientWidth;
-            }
-            block.style.height = this._blockHeight + 'px';
-            block.style.lineHeight = this._blockHeight + 'px';
-            block.style.fontSize = this._blockHeight + 'px';
-            return block;
+    }
+    block.style.width = 100 / this.gameFieldBorderY.length + "%";
+    if (!this._blockHeight) {
+      this._blockHeight = block.clientWidth;
+    }
+    block.style.height = this._blockHeight + "px";
+    block.style.lineHeight = this._blockHeight + "px";
+    block.style.fontSize = this._blockHeight + "px";
+    return block;
   },
 
+  /**
+   * Возвращает id игровой ячейки, генериремого на базе координат
+   * и типа игрового поля
+   * @param {type} yPoint
+   * @param {type} xPoint
+   * @param {type} type
+   * @return {String}
+   */
+  getPointBlockIdByCoords: function (yPoint, xPoint, type) {
+    if (type && type === "user") {
+      return "user_x" + xPoint + "_y" + yPoint;
+    }
+    return "pc_x" + xPoint + "_y" + yPoint;
+  },
 
-  
+  /**
+   * Создает масив с координатами полей, из которых компьютер
+   * случайно выбирает координаты для обстрела
+   * @return {Array|SeeBattle.prototype.generateShotMap.map}
+   */
+  generateShotMap: function () {
+    var map = [];
+    for (var yPoint = 0; yPoint < this.gameFieldBorderY.length; yPoint++) {
+      for (var xPoint = 0; xPoint < this.gameFieldBorderX.length; xPoint++) {
+        map.push({ y: yPoint, x: xPoint });
+      }
+    }
+    return map;
+  },
+
+  /**
+   * Генерирует массив содержащий информацию о том есть или нет корабля
+   * @return {Array}
+   */
+  generateRandomShipMap: function () {
+    var map = [];
+    // генерация карты расположения, вклчающей отрицательный координаты
+    // для возможности размещения у границ
+    for (var yPoint = -1; yPoint < this.gameFieldBorderY.length + 1; yPoint++) {
+      for (
+        var xPoint = -1;
+        xPoint < this.gameFieldBorderX.length + 1;
+        xPoint++
+      ) {
+        if (!map[yPoint]) {
+          map[yPoint] = [];
+        }
+        map[yPoint][xPoint] = this.CELL_EMPTY;
+        console.log(map);
+      }
+    }
+
+    // получение копии настроек кораблей для дальнейших манипуляций
+    var shipsConfiguration = JSON.parse(
+      JSON.stringify(this.shipsConfiguration)
+    );
+    var allShipsPlaced = false;
+    while (allShipsPlaced === false) {
+      var xPoint = this.getRandomInt(0, this.gameFieldBorderX.length);
+      var yPoint = this.getRandomInt(0, this.gameFieldBorderY.length);
+      if (this.isPointFree(map, xPoint, yPoint) === true) {
+        if (
+          this.canPutHorizontal(
+            map,
+            xPoint,
+            yPoint,
+            shipsConfiguration[0].pointCount,
+            this.gameFieldBorderX.length
+          )
+        ) {
+          for (var i = 0; i < shipsConfiguration[0].pointCount; i++) {
+            map[yPoint][xPoint + i] = this.CELL_WITH_SHIP;
+          }
+        } else if (
+          this.canPutVertical(
+            map,
+            xPoint,
+            yPoint,
+            shipsConfiguration[0].pointCount,
+            this.gameFieldBorderY.length
+          )
+        ) {
+          for (var i = 0; i < shipsConfiguration[0].pointCount; i++) {
+            map[yPoint + i][xPoint] = this.CELL_WITH_SHIP;
+          }
+        } else {
+          continue;
+        }
+
+        // обоновление настроек кораблей, если цикл не был пропущен
+        // и корабль стало быть расставлен
+        shipsConfiguration[0].maxShips--;
+        if (shipsConfiguration[0].maxShips < 1) {
+          shipsConfiguration.splice(0, 1);
+        }
+        if (shipsConfiguration.length === 0) {
+          allShipsPlaced = true;
+        }
+      }
+    }
+    return map;
+  },
 };
