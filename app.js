@@ -329,7 +329,33 @@ seaBattle.prototype = {
     }
     return freePoints >= shipLength;
   },
-  
+  userFire: function (event) {
+    if (this.isGameStopped() || this.isComputerGoes()) {
+      return;
+    }
+    var e = event || window.event;
+    var firedEl = e.target;
+    var x = firedEl.getAttribute("data-x");
+    var y = firedEl.getAttribute("data-y");
+    if (this._computerShipsMap[y][x] === this.CELL_EMPTY) {
+      firedEl.innerHTML = this.getFireFailTemplate();
+      this.prepareToPcFire();
+    } else {
+      firedEl.innerHTML = this.getFireSuccessTemplate();
+      firedEl.setAttribute("class", "ship");
+      this._userHits++;
+      this.updateToolbar();
+      if (this._userHits >= this._hitsForWin) {
+        this.stopGame();
+      }
+    }
+    firedEl.onclick = null;
+  },
+  _computerGoes: false,
+  isComputerGoes: function () {
+    return this._computerGoes;
+  },
+
 
 
 
