@@ -1,4 +1,8 @@
-function seaBattle(gameAreaId) {
+(function (root, factory) {
+  root.SeaBattle = factory();
+})(typeof self !== "undefined" ? self : this, function () {
+
+function SeaBattle(gameAreaId) {
   // Определяем границы поля
   this.gameFieldBorderX = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
   this.gameFieldBorderY = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
@@ -20,12 +24,13 @@ function seaBattle(gameAreaId) {
   // Подсчет очков для победы
   this._hitsForWin = 0;
 
-  shipsConfiguration.forEach((element) => {
-    this._hitsForWin = +(
-      this.shipsConfiguration[element].maxShips *
-      this.shipsConfiguration[element].pointCount
-    );
-  });
+  for (let i = 0; i < this.shipsConfiguration.length; i++) {
+    this._hitsForWin =
+      +this._hitsForWin +
+      this.shipsConfiguration[i].maxShips *
+        this.shipsConfiguration[i].pointCount;
+    console.log(this);
+  }
   //  Карты кораблей для Игрока и компьютера
   this._computerShipsMap = null;
   this._userShipsMap = null;
@@ -46,7 +51,7 @@ function seaBattle(gameAreaId) {
   this.userGameField = null;
 }
 
-seaBattle.prototype = {
+SeaBattle.prototype = {
   // Вызов ф-й создающих необходимую для игры разметку
   init: function () {
     this.createToolbar(), this.createGameFields(), this.createFooter();
@@ -87,11 +92,9 @@ seaBattle.prototype = {
     this.startGameButton = document.createElement("button");
     this.startGameButton.innerHTML = "Start the Game";
     this.startGameButton.setAttribute("class", "btn");
-    this.startGameButton
-      .addEventListener("click", () => {
-        this.startNewGame();
-      })
-      .bind(this);
+    this.startGameButton.onclick = function () {
+      this.startNewGame();
+    }.bind(this);
     footer.appendChild(this.startGameButton);
     this.gameArea.appendChild(footer);
   },
@@ -105,7 +108,7 @@ seaBattle.prototype = {
     }
     this.startGameButton.innerHTML = "Start over";
     this.computerName.innerHTML = `${this.computerName} your Enemy`;
-    this.userName.innerHTML = `${this.userName} your field`;
+    this.userName.innerHTML = `${this.userName} + 'your field'`;
 
     this._computerShipsMap = this.generateRandomShipMap();
     this._userShipsMap = this.generateRandomShipMap();
@@ -122,27 +125,30 @@ seaBattle.prototype = {
   },
 
   drawGamePoints: function () {
-    this.gameFieldBorderY.forEach((yPoint) =>
-      this.gameFieldBorderX.forEach((xPoint) => {
-        let computerPointBlock = getOrCreateBlock(yPoint, xPoint);
-        computerPointBlock.addEventListener(
-          "click",
-          function (e) {
-            this.userFire(e);
-          }.bind(this)
+    for (let yPoint = 0; yPoint < this.gameFieldBorderY.length; yPoint++) {
+      for (let xPoint = 0; xPoint < this.gameFieldBorderX.length; xPoint++) {
+        let computerPointBlock = this.getOrCreatePointBlock(yPoint, xPoint);
+        computerPointBlock.onclick = function (e) {
+          this.userFire(e);
+        }.bind(this);
+      
+
+        let userPointBlock = this.getOrCreatePointBlock(
+          yPoint,
+          xPoint,
+          "user"
         );
-        let userPointBlock = getOrCreateBlock(yPoint, xPoint, "user");
         if (this._userShipsMap[yPoint][xPoint] === this.CELL_WITH_SHIP) {
           userPointBlock.setAttribute("class", "ship");
         }
-      })
-    );
+      }
+    }
   },
   // _blockHeight = null,
 
   getOrCreatePointBlock: function (yPoint, xPoint, type) {
-    var id = this.getPointBlockIdByCoords(yPoint, xPoint, type);
-    var block = document.getElementById(id);
+    let id = this.getPointBlockIdByCoords(yPoint, xPoint, type);
+    let block = document.getElementById(id);
     if (block) {
       block.innerHTML = "";
       block.setAttribute("class", "");
@@ -154,7 +160,7 @@ seaBattle.prototype = {
       if (type && type === "user") {
         this.userGameField.appendChild(block);
       } else {
-        this.pcGameField.appendChild(block);
+        this.computerGameField.appendChild(block);
       }
     }
     block.style.width = 100 / this.gameFieldBorderY.length + "%";
@@ -167,14 +173,8 @@ seaBattle.prototype = {
     return block;
   },
 
-  /**
-   * Возвращает id игровой ячейки, генериремого на базе координат
-   * и типа игрового поля
-   * @param {type} yPoint
-   * @param {type} xPoint
-   * @param {type} type
-   * @return {String}
-   */
+  
+  // Возвращает ID ячейки используя координаты
   getPointBlockIdByCoords: function (yPoint, xPoint, type) {
     if (type && type === "user") {
       return "user_x" + xPoint + "_y" + yPoint;
@@ -182,32 +182,25 @@ seaBattle.prototype = {
     return "pc_x" + xPoint + "_y" + yPoint;
   },
 
-  /**
-   * Создает масив с координатами полей, из которых компьютер
-   * случайно выбирает координаты для обстрела
-   * @return {Array|SeeBattle.prototype.generateShotMap.map}
-   */
+  // Создание массива для будущего обстрела
   generateShotMap: function () {
-    var map = [];
-    for (var yPoint = 0; yPoint < this.gameFieldBorderY.length; yPoint++) {
-      for (var xPoint = 0; xPoint < this.gameFieldBorderX.length; xPoint++) {
+    let map = [];
+    for (let yPoint = 0; yPoint < this.gameFieldBorderY.length; yPoint++) {
+      for (let xPoint = 0; xPoint < this.gameFieldBorderX.length; xPoint++) {
         map.push({ y: yPoint, x: xPoint });
       }
     }
     return map;
   },
 
-  /**
-   * Генерирует массив содержащий информацию о том есть или нет корабля
-   * @return {Array}
-   */
+//  Массив содержащий информацию есть ли корабль в ячейке
   generateRandomShipMap: function () {
-    var map = [];
+    let map = [];
     // генерация карты расположения, вклчающей отрицательный координаты
     // для возможности размещения у границ
-    for (var yPoint = -1; yPoint < this.gameFieldBorderY.length + 1; yPoint++) {
+    for (let yPoint = -1; yPoint < this.gameFieldBorderY.length + 1; yPoint++) {
       for (
-        var xPoint = -1;
+        let xPoint = -1;
         xPoint < this.gameFieldBorderX.length + 1;
         xPoint++
       ) {
@@ -220,13 +213,13 @@ seaBattle.prototype = {
     }
 
     // получение копии настроек кораблей для дальнейших манипуляций
-    var shipsConfiguration = JSON.parse(
+    let shipsConfiguration = JSON.parse(
       JSON.stringify(this.shipsConfiguration)
     );
-    var allShipsPlaced = false;
+    let allShipsPlaced = false;
     while (allShipsPlaced === false) {
-      var xPoint = this.getRandomInt(0, this.gameFieldBorderX.length);
-      var yPoint = this.getRandomInt(0, this.gameFieldBorderY.length);
+      let xPoint = this.getRandomInt(0, this.gameFieldBorderX.length);
+      let yPoint = this.getRandomInt(0, this.gameFieldBorderY.length);
       if (this.isPointFree(map, xPoint, yPoint) === true) {
         if (
           this.canPutHorizontal(
@@ -237,7 +230,7 @@ seaBattle.prototype = {
             this.gameFieldBorderX.length
           )
         ) {
-          for (var i = 0; i < shipsConfiguration[0].pointCount; i++) {
+          for (let i = 0; i < shipsConfiguration[0].pointCount; i++) {
             map[yPoint][xPoint + i] = this.CELL_WITH_SHIP;
           }
         } else if (
@@ -249,15 +242,14 @@ seaBattle.prototype = {
             this.gameFieldBorderY.length
           )
         ) {
-          for (var i = 0; i < shipsConfiguration[0].pointCount; i++) {
+          for (let i = 0; i < shipsConfiguration[0].pointCount; i++) {
             map[yPoint + i][xPoint] = this.CELL_WITH_SHIP;
           }
         } else {
           continue;
         }
 
-        // обоновление настроек кораблей, если цикл не был пропущен
-        // и корабль стало быть расставлен
+        // Если корабль встал на карту
         shipsConfiguration[0].maxShips--;
         if (shipsConfiguration[0].maxShips < 1) {
           shipsConfiguration.splice(0, 1);
@@ -275,7 +267,7 @@ seaBattle.prototype = {
   },
  
   // Проверяем координаты покругу, по часовой стрелке
-  isPointFree: function() {
+  isPointFree: function(map,xPoint,yPoint) {
     if(
       map[yPoint][xPoint] ===this.CELL_EMPTY &&
       map[yPoint-1][xPoint] ===this.CELL_EMPTY &&
@@ -285,15 +277,15 @@ seaBattle.prototype = {
       map[yPoint+1][xPoint] ===this.CELL_EMPTY &&
       map[yPoint+1][xPoint-1] ===this.CELL_EMPTY &&
       map[yPoint][xPoint-1] ===this.CELL_EMPTY &&
-      map[yPoint-1][xPoint-1] ===this.CELL_EMPTY &&
+      map[yPoint-1][xPoint-1] ===this.CELL_EMPTY
       ) {
         return true
       }
       return false
   },
   canPutHorizontal: function (map, xPoint, yPoint, shipLength, coordLength) {
-    var freePoints = 0;
-    for (var x = xPoint; x < coordLength; x++) {
+    let freePoints = 0;
+    for (let x = xPoint; x < coordLength; x++) {
       // текущая и далее по часовй стрелке в гориз направл
       if (
         map[yPoint][x] === this.CELL_EMPTY &&
@@ -311,8 +303,8 @@ seaBattle.prototype = {
     return freePoints >= shipLength;
   },
   canPutVertical: function (map, xPoint, yPoint, shipLength, coordLength) {
-    var freePoints = 0;
-    for (var y = yPoint; y < coordLength; y++) {
+    let freePoints = 0;
+    for (let y = yPoint; y < coordLength; y++) {
       // текущая и далее по часовй стрелке в вертикальном направлении
       if (
         map[y][xPoint] === this.CELL_EMPTY &&
@@ -333,10 +325,10 @@ seaBattle.prototype = {
     if (this.isGameStopped() || this.isComputerGoes()) {
       return;
     }
-    var e = event || window.event;
-    var firedEl = e.target;
-    var x = firedEl.getAttribute("data-x");
-    var y = firedEl.getAttribute("data-y");
+    let e = event || window.event;
+    let firedEl = e.target;
+    let x = firedEl.getAttribute("data-x");
+    let y = firedEl.getAttribute("data-y");
     if (this._computerShipsMap[y][x] === this.CELL_EMPTY) {
       firedEl.innerHTML = this.getFireFailTemplate();
       this.prepareToComputerFire();
@@ -370,14 +362,14 @@ seaBattle.prototype = {
       return;
     }
     // Рандомный выстрел на основе карты
-    var randomShotIndex = this.getRandomInt(0, this._computerShotMap.length);
-    var randomShot = JSON.parse(
+    let randomShotIndex = this.getRandomInt(0, this._computerShotMap.length);
+    let randomShot = JSON.parse(
       JSON.stringify(this._computerShotMap[randomShotIndex])
     );
     
     this._computerShotMap.splice(randomShotIndex, 1);
 
-    var firedEl = document.getElementById(
+    let firedEl = document.getElementById(
       this.getPointBlockIdByCoords(randomShot.y, randomShot.x, "user")
     );
     if (this._userShipsMap[randomShot.y][randomShot.x] === this.CELL_EMPTY) {
@@ -418,7 +410,7 @@ seaBattle.prototype = {
       } else {
         this.toolbar.innerHTML += ", победил ваш противник";
       }
-    } else if (this.isPCGoing()) {
+    } else if (this.isComputerGoes()) {
       this.toolbar.innerHTML += ", ходит ваш противник";
     } else {
       this.toolbar.innerHTML += ", сейчас ваш ход";
@@ -432,10 +424,12 @@ seaBattle.prototype = {
       } else {
         this.toolbar.innerHTML += ", победил ваш противник";
       }
-    } else if (this.isPCGoing()) {
+    } else if (this.isComputerGoes()) {
       this.toolbar.innerHTML += ", ходит ваш противник";
     } else {
       this.toolbar.innerHTML += ", сейчас ваш ход";
     }
   },
-};
+} 
+return SeaBattle;
+});

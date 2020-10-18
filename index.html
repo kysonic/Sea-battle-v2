@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+
 </head>
 <body>
-    <div id="game-area-id" class="game-field">
+    <div id="game-area-id" class="game-area">
          This is the field!
+        <div class="footer htmlpreview-fallback">
+            <button class="btn" onclick="runGame(true)">Start the game</button>
+        </div>
     </div>
+
+<script src="./app.js"></script>
+<script>
+    function runGame(startImmediatly) {
+         var game = new SeaBattle('gameArea');
+         game.init();
+    }
+    </script>
 </body>
+
 </html>
