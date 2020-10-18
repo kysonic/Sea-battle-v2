@@ -410,9 +410,32 @@ seaBattle.prototype = {
   getFireFailTemplate: function () {
     return "&#183;";
   },
-
-
-
-
-
+  updateToolbar: function () {
+    this.toolbar.innerHTML = "Счет - " + this._computerHits + ":" + this._userHits;
+    if (this.isGameStopped()) {
+      if (this._userHits >= this._hitsForWin) {
+        this.toolbar.innerHTML += ", вы победили";
+      } else {
+        this.toolbar.innerHTML += ", победил ваш противник";
+      }
+    } else if (this.isPCGoing()) {
+      this.toolbar.innerHTML += ", ходит ваш противник";
+    } else {
+      this.toolbar.innerHTML += ", сейчас ваш ход";
+    }
+  },
+  updateToolbar: function () {
+    this.toolbar.innerHTML = "Счет - " + this._computerHits + ":" + this._userHits;
+    if (this.isGameStopped()) {
+      if (this._userHits >= this._hitsForWin) {
+        this.toolbar.innerHTML += ", вы победили";
+      } else {
+        this.toolbar.innerHTML += ", победил ваш противник";
+      }
+    } else if (this.isPCGoing()) {
+      this.toolbar.innerHTML += ", ходит ваш противник";
+    } else {
+      this.toolbar.innerHTML += ", сейчас ваш ход";
+    }
+  },
 };
