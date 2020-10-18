@@ -8,7 +8,7 @@
 
 </head>
 <body>
-    <div id="game-area-id" class="game-area">
+    <div id="game-area-id">
         <div class="footer htmlpreview-fallback">
             <button class="btn" onclick="runGame(true)">Start the game</button>
         </div>
@@ -17,8 +17,12 @@
 <script src="./app.js"></script>
 <script>
     function runGame(startImmediatly) {
-         var game = new SeaBattle('gameArea');
+         let game = new SeaBattle('gameArea');
          game.init();
+
+         if (startImmediatly) {
+                game.startNewGame();
+             }
     }
     </script>
 </body>
