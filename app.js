@@ -149,7 +149,7 @@ seaBattle.prototype = {
     } else {
       block = document.createElement("div");
       block.setAttribute("id", id);
-      block.setAttribute('data-x', xPoint);
+      block.setAttribute("data-x", xPoint);
       block.setAttribute("data-y", yPoint);
       if (type && type === "user") {
         this.userGameField.appendChild(block);
@@ -269,4 +269,31 @@ seaBattle.prototype = {
     }
     return map;
   },
+// Получаем случайное значение 
+  getRandomInt: function(min,max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  },
+ 
+  // Проверяем координаты покругу, по часовой стрелке
+  isPointFree: function() {
+    if(
+      map[yPoint][xPoint] ===this.CELL_EMPTY &&
+      map[yPoint-1][xPoint] ===this.CELL_EMPTY &&
+      map[yPoint-1][xPoint+1] ===this.CELL_EMPTY &&
+      map[yPoint][xPoint+1] ===this.CELL_EMPTY &&
+      map[yPoint+1][xPoint+1] ===this.CELL_EMPTY &&
+      map[yPoint+1][xPoint] ===this.CELL_EMPTY &&
+      map[yPoint+1][xPoint-1] ===this.CELL_EMPTY &&
+      map[yPoint][xPoint-1] ===this.CELL_EMPTY &&
+      map[yPoint-1][xPoint-1] ===this.CELL_EMPTY &&
+      ) {
+        return true
+      }
+      return false
+  },
+
+  
+
+
+
 };
