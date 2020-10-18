@@ -339,7 +339,7 @@ seaBattle.prototype = {
     var y = firedEl.getAttribute("data-y");
     if (this._computerShipsMap[y][x] === this.CELL_EMPTY) {
       firedEl.innerHTML = this.getFireFailTemplate();
-      this.prepareToPcFire();
+      this.prepareToComputerFire();
     } else {
       firedEl.innerHTML = this.getFireSuccessTemplate();
       firedEl.setAttribute("class", "ship");
@@ -354,6 +354,61 @@ seaBattle.prototype = {
   _computerGoes: false,
   isComputerGoes: function () {
     return this._computerGoes;
+  },
+  prepareToComputerFire: function () {
+    this._computerGoes = true;
+    this.updateToolbar();
+    setTimeout(
+      function () {
+        this.computerFire();
+      }.bind(this),
+      this.computerDelay
+    );
+  },
+  computerFire: function () {
+    if (this.isGameStopped()) {
+      return;
+    }
+    // Рандомный выстрел на основе карты
+    var randomShotIndex = this.getRandomInt(0, this._computerShotMap.length);
+    var randomShot = JSON.parse(
+      JSON.stringify(this._computerShotMap[randomShotIndex])
+    );
+    
+    this._computerShotMap.splice(randomShotIndex, 1);
+
+    var firedEl = document.getElementById(
+      this.getPointBlockIdByCoords(randomShot.y, randomShot.x, "user")
+    );
+    if (this._userShipsMap[randomShot.y][randomShot.x] === this.CELL_EMPTY) {
+      firedEl.innerHTML = this.getFireFailTemplate();
+    } else {
+      firedEl.innerHTML = this.getFireSuccessTemplate();
+      this._computerHits++;
+      this.updateToolbar();
+      if (this._computerHits >= this._hitsForWin) {
+        this.stopGame();
+      } else {
+        this.prepareToComputerFire();
+      }
+    }
+    this._computerGoes = false;
+    this.updateToolbar();
+  },
+  stopGame: function () {
+    this._gameStopped = true;
+    this._computerGoes = false;
+    this.startGameButton.innerHTML = "Play again?";
+    this.updateToolbar();
+  },
+  isGameStopped: function () {
+    return this._gameStopped;
+  },
+  getFireSuccessTemplate: function () {
+    return "X";
+  },
+  getFireFailTemplate: function () {
+    return "&#183;";
   },
 
 
