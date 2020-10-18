@@ -173,7 +173,6 @@ SeaBattle.prototype = {
     return block;
   },
 
-  
   // Возвращает ID ячейки используя координаты
   getPointBlockIdByCoords: function (yPoint, xPoint, type) {
     if (type && type === "user") {

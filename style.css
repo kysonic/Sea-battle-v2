@@ -5,7 +5,6 @@ html {
 }
 body {
     margin: 0;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 14px;
     line-height: 1.4;
     color: #333;
@@ -36,7 +35,7 @@ body {
     position: relative;
     float: left;
     background-color: #fcfcfc;
-    border: 1px solid #a7ddf5;
+    border: 1px solid grey;
     text-align: center;
     color: #F44336;
 }
@@ -45,9 +44,9 @@ body {
     color: #F44336;
 }
 #game-area-id .game-field .ship{
-    background-color: #7bc4ff;
+    background-color: #333;
 }
-#game-area-id.btn{
+#game-area-id .btn{
     display: inline-block;
     margin-bottom: 0;
     font-weight: 400;
@@ -62,5 +61,5 @@ body {
     user-select: none;
     font-size: 1.2em;
     color: #fff;
-    background-color: #428bca;
+    background-color: #333;
 }
