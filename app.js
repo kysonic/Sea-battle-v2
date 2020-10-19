@@ -21,18 +21,17 @@
     this.computerDelay = 1000;
 
     // Подсчет очков для победы
-    this._hitsForWin = 0;
+    this.hitsForWin = 0;
 
     for (let i = 0; i < this.shipsConfiguration.length; i++) {
-      this._hitsForWin =
-        +this._hitsForWin +
+      this.hitsForWin =
+        +this.hitsForWin +
         this.shipsConfiguration[i].maxShips *
           this.shipsConfiguration[i].pointCount;
-      console.log(this);
     }
     //  Карты кораблей для Игрока и компьютера
-    this._computerShipsMap = null;
-    this._userShipsMap = null;
+    this.computerShipsMap = null;
+    this.userShipsMap = null;
 
     this.gameStopped = false;
 
@@ -109,15 +108,15 @@
       this.computerInfo.innerHTML = this.computerName + " (ваш противник)";
       this.userInfo.innerHTML = this.userName + " (ваше поле)";
 
-      this._computerShipsMap = this.generateRandomShipMap();
-      this._userShipsMap = this.generateRandomShipMap();
-      this._computerShotMap = this.generateShotMap();
+      this.computerShipsMap = this.generateRandomShipMap();
+      this.userShipsMap = this.generateRandomShipMap();
+      this.computerShotMap = this.generateShotMap();
 
-      this._userHits = 0;
-      this._computerHits = 0;
-      this._blockHeight = null;
-      this._gameStopped = false;
-      this._computerGoes = false;
+      this.userHits = 0;
+      this.computerHits = 0;
+      this.blockHeight = null;
+      this.gameStopped = false;
+      this.computerGoes = false;
 
       this.drawGamePoints();
       this.updateToolbar();
@@ -136,13 +135,13 @@
             xPoint,
             "user"
           );
-          if (this._userShipsMap[yPoint][xPoint] === this.CELL_WITH_SHIP) {
+          if (this.userShipsMap[yPoint][xPoint] === this.CELL_WITH_SHIP) {
             userPointBlock.setAttribute("class", "ship");
           }
         }
       }
     },
-    // _blockHeight = null,
+  
 
     getOrCreatePointBlock: function (yPoint, xPoint, type) {
       let id = this.getPointBlockIdByCoords(yPoint, xPoint, type);
@@ -162,12 +161,12 @@
         }
       }
       block.style.width = 100 / this.gameFieldBorderY.length + "%";
-      if (!this._blockHeight) {
-        this._blockHeight = block.clientWidth;
+      if (!this.blockHeight) {
+        this.blockHeight = block.clientWidth;
       }
-      block.style.height = this._blockHeight + "px";
-      block.style.lineHeight = this._blockHeight + "px";
-      block.style.fontSize = this._blockHeight + "px";
+      block.style.height = this.blockHeight + "px";
+      block.style.lineHeight = this.blockHeight + "px";
+      block.style.fontSize = this.blockHeight + "px";
       return block;
     },
 
@@ -209,7 +208,6 @@
             map[yPoint] = [];
           }
           map[yPoint][xPoint] = this.CELL_EMPTY;
-          console.log(map);
         }
       }
 
@@ -233,6 +231,7 @@
           ) {
             for (let i = 0; i < shipsConfiguration[0].pointCount; i++) {
               map[yPoint][xPoint + i] = this.CELL_WITH_SHIP;
+              
             }
           } else if (
             this.canPutVertical(
@@ -286,7 +285,7 @@
     canPutHorizontal: function (map, xPoint, yPoint, shipLength, coordLength) {
       let freePoints = 0;
       for (let x = xPoint; x < coordLength; x++) {
-        // текущая и далее по часовй стрелке в гориз направл
+        // Проверяем координаты покругу, по часовой стрелке
         if (
           map[yPoint][x] === this.CELL_EMPTY &&
           map[yPoint - 1][x] === this.CELL_EMPTY &&
@@ -329,26 +328,26 @@
       let firedEl = e.target;
       let x = firedEl.getAttribute("data-x");
       let y = firedEl.getAttribute("data-y");
-      if (this._computerShipsMap[y][x] === this.CELL_EMPTY) {
+      if (this.computerShipsMap[y][x] === this.CELL_EMPTY) {
         firedEl.innerHTML = this.getFireFailTemplate();
         this.prepareToComputerFire();
       } else {
         firedEl.innerHTML = this.getFireSuccessTemplate();
         firedEl.setAttribute("class", "ship");
-        this._userHits++;
+        this.userHits++;
         this.updateToolbar();
-        if (this._userHits >= this._hitsForWin) {
+        if (this.userHits >= this.hitsForWin) {
           this.stopGame();
         }
       }
       firedEl.onclick = null;
     },
-    _computerGoes: false,
+    computerGoes: false,
     isComputerGoes: function () {
-      return this._computerGoes;
+      return this.computerGoes;
     },
     prepareToComputerFire: function () {
-      this._computerGoes = true;
+      this.computerGoes = true;
       this.updateToolbar();
       setTimeout(
         function () {
@@ -362,39 +361,39 @@
         return;
       }
       // Рандомный выстрел на основе карты
-      let randomShotIndex = this.getRandomInt(0, this._computerShotMap.length);
+      let randomShotIndex = this.getRandomInt(0, this.computerShotMap.length);
       let randomShot = JSON.parse(
-        JSON.stringify(this._computerShotMap[randomShotIndex])
+        JSON.stringify(this.computerShotMap[randomShotIndex])
       );
 
-      this._computerShotMap.splice(randomShotIndex, 1);
+      this.computerShotMap.splice(randomShotIndex, 1);
 
       let firedEl = document.getElementById(
         this.getPointBlockIdByCoords(randomShot.y, randomShot.x, "user")
       );
-      if (this._userShipsMap[randomShot.y][randomShot.x] === this.CELL_EMPTY) {
+      if (this.userShipsMap[randomShot.y][randomShot.x] === this.CELL_EMPTY) {
         firedEl.innerHTML = this.getFireFailTemplate();
       } else {
         firedEl.innerHTML = this.getFireSuccessTemplate();
-        this._computerHits++;
+        this.computerHits++;
         this.updateToolbar();
-        if (this._computerHits >= this._hitsForWin) {
+        if (this.computerHits >= this.hitsForWin) {
           this.stopGame();
         } else {
           this.prepareToComputerFire();
         }
       }
-      this._computerGoes = false;
+      this.computerGoes = false;
       this.updateToolbar();
     },
     stopGame: function () {
-      this._gameStopped = true;
-      this._computerGoes = false;
+      this.gameStopped = true;
+      this.computerGoes = false;
       this.startGameButton.innerHTML = "Play again?";
       this.updateToolbar();
     },
     isGameStopped: function () {
-      return this._gameStopped;
+      return this.gameStopped;
     },
     getFireSuccessTemplate: function () {
       return "X";
@@ -404,9 +403,9 @@
     },
     updateToolbar: function () {
       this.toolbar.innerHTML =
-        "Счет - " + this._computerHits + ":" + this._userHits;
+        "Счет - " + this.computerHits + ":" + this.userHits;
       if (this.isGameStopped()) {
-        if (this._userHits >= this._hitsForWin) {
+        if (this.userHits >= this.hitsForWin) {
           this.toolbar.innerHTML += ", вы победили";
         } else {
           this.toolbar.innerHTML += ", победил ваш противник";
@@ -419,9 +418,9 @@
     },
     updateToolbar: function () {
       this.toolbar.innerHTML =
-        "Счет - " + this._computerHits + ":" + this._userHits;
+        "Счет - " + this.computerHits + ":" + this.userHits;
       if (this.isGameStopped()) {
-        if (this._userHits >= this._hitsForWin) {
+        if (this.userHits >= this.hitsForWin) {
           this.toolbar.innerHTML += ", вы победили";
         } else {
           this.toolbar.innerHTML += ", победил ваш противник";
